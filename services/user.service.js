@@ -22,7 +22,9 @@ function getById(userId) {
 
 function login({ username, password }) {
   return storageService.query(STORAGE_KEY).then((users) => {
-    const user = users.find((user) => user.username === username);
+    const user = users.find(
+      (user) => user.username === username && user.password === password
+    );
     if (user) return _setLoggedinUser(user);
     else return Promise.reject("Invalid login");
   });
@@ -49,14 +51,16 @@ function getLoggedinUser() {
 function _setLoggedinUser(user) {
   const userToSave = { _id: user._id, fullname: user.fullname };
   sessionStorage.setItem(STORAGE_KEY_LOGGEDIN, JSON.stringify(userToSave));
+  console.log(userToSave, "userToSave , we good here");
+
   return userToSave;
 }
 
 function getEmptyCredentials() {
   return {
     fullname: "",
-    username: "muki",
-    password: "muki1",
+    username: "",
+    password: "",
   };
 }
 
