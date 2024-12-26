@@ -25,6 +25,10 @@ export function loadTodos() {
 }
 
 export function removeTodo(todoId) {
+  const isConfirmed = window.confirm(
+    "Are you sure you want to remove this todo?"
+  );
+  if (!isConfirmed) return;
   store.dispatch({ type: "REMOVE_TODO", todoId });
   todoService
     .remove(todoId)

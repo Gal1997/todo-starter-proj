@@ -14,6 +14,7 @@ const { useSelector, useDispatch } = ReactRedux;
 export function TodoIndex() {
   // const [todos, setTodos] = useState(null);
   const todos = useSelector((state) => state.todosModule.todos);
+  const dispatch = useDispatch();
 
   // Special hook for accessing search-params:
   const [searchParams, setSearchParams] = useSearchParams();
@@ -23,7 +24,9 @@ export function TodoIndex() {
   const [filterBy, setFilterBy] = useState(defaultFilter);
 
   useEffect(() => {
-    setSearchParams(filterBy);
+    setSearchParams(getNonEmptyValues(filterBy));
+
+    dispatch({ type: "SET_FILTER_BY", filterBy });
     loadTodos();
     /*     todoService
       .query(filterBy)
@@ -33,6 +36,12 @@ export function TodoIndex() {
         showErrorMsg("Cannot load todos");
       }); */
   }, [filterBy]);
+
+  function getNonEmptyValues(obj) {
+    return Object.fromEntries(
+      Object.entries(obj).filter(([key, value]) => value !== "")
+    );
+  }
 
   function onRemoveTodo(todoId) {
     removeTodo(todoId); // TODO: Make optimistic
