@@ -8,6 +8,7 @@ export const userService = {
   getById,
   query,
   getEmptyCredentials,
+  updateUser,
 };
 const STORAGE_KEY_LOGGEDIN = "user";
 const STORAGE_KEY = "userDB";
@@ -25,8 +26,10 @@ function login({ username, password }) {
     const user = users.find(
       (user) => user.username === username && user.password === password
     );
-    if (user) return _setLoggedinUser(user);
-    else return Promise.reject("Invalid login");
+    if (user) {
+      _setLoggedinUser(user);
+      return user;
+    } else return Promise.reject("Invalid login");
   });
 }
 
@@ -35,8 +38,10 @@ function signup({ username, password, fullname }) {
   user.createdAt = user.updatedAt = Date.now();
   user.balance = 10000;
   user.activities = [];
-
-  return storageService.post(STORAGE_KEY, user).then(_setLoggedinUser);
+  return storageService.post(STORAGE_KEY, user).then((savedUser) => {
+    _setLoggedinUser(savedUser);
+    return savedUser;
+  });
 }
 
 function logout() {
@@ -44,14 +49,32 @@ function logout() {
   return Promise.resolve();
 }
 
+function updateUser(user) {
+  return storageService.put(STORAGE_KEY, user);
+}
+
 function getLoggedinUser() {
-  return JSON.parse(sessionStorage.getItem(STORAGE_KEY_LOGGEDIN));
+  let loggedInUserID;
+  try {
+    loggedInUserID = JSON.parse(
+      sessionStorage.getItem(STORAGE_KEY_LOGGEDIN)
+    )._id;
+  } catch (err) {
+    return null;
+  }
+
+  if (!loggedInUserID) return null;
+
+  const allUsers = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  return allUsers.find((user) => user._id === loggedInUserID);
 }
 
 function _setLoggedinUser(user) {
-  const userToSave = { _id: user._id, fullname: user.fullname };
+  const userToSave = {
+    _id: user._id,
+    fullname: user.fullname,
+  };
   sessionStorage.setItem(STORAGE_KEY_LOGGEDIN, JSON.stringify(userToSave));
-  console.log(userToSave, "userToSave , we good here");
 
   return userToSave;
 }
@@ -61,6 +84,7 @@ function getEmptyCredentials() {
     fullname: "",
     username: "",
     password: "",
+    balance: 0,
   };
 }
 

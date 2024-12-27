@@ -1,4 +1,4 @@
-const { useState } = React;
+const { useState, useEffect } = React;
 const { Link, NavLink } = ReactRouterDOM;
 const { useNavigate } = ReactRouter;
 const { useSelector, useDispatch } = ReactRedux;
@@ -8,13 +8,14 @@ import { UserMsg } from "./UserMsg.jsx";
 import { LoginSignup } from "./LoginSignup.jsx";
 import { showErrorMsg } from "../services/event-bus.service.js";
 import { logout } from "../services/store-actions/user.actions.js";
+import { loadTodos } from "../services/store-actions/todos.actions.js";
 
 export function AppHeader() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   // const [user, setUser] = useState(userService.getLoggedinUser());
   const user = useSelector((storeState) => storeState.userModule.loggedInUser);
-  console.log("user", user);
+  console.log("Currently logged in user : ", user);
 
   const totalTodos = useSelector(
     (storeState) => storeState.todosModule.todos.length
@@ -25,6 +26,10 @@ export function AppHeader() {
       storeState.todosModule.todos.filter((todo) => todo.isDone).length
   );
 
+  useEffect(() => {
+    if (!totalTodos || totalTodos.length === 0) loadTodos();
+  }, []);
+
   function onLogout() {
     logout().catch((err) => {
       showErrorMsg("OOPs try again");
@@ -34,6 +39,7 @@ export function AppHeader() {
   function ProgressBar({ current, total }) {
     // Calculate the percentage progress
     const progress = Math.min((current / total) * 100, 100); // Ensure it doesn't exceed 100%
+    if (!progress && progress != 0) return <p>Loading...</p>;
 
     return (
       <div className="progress-bar-container">
@@ -51,7 +57,7 @@ export function AppHeader() {
   return (
     <header className="app-header full main-layout">
       <section className="header-container">
-        <h1>React Todo App</h1>
+        <h1 style={{ fontSize: "30px" }}>Gal's Todo App</h1>
 
         <div
           style={{
@@ -63,13 +69,20 @@ export function AppHeader() {
             marginBottom: "0.3rem",
           }}
         >
-          <h1>Progress Bar</h1>
-          <ProgressBar current={doneTodos} total={totalTodos} />
+          {user && <h1>Progress Bar</h1>}
+          {user && <ProgressBar current={doneTodos} total={totalTodos} />}
         </div>
         {user ? (
           <section>
-            <Link to={`/user/${user._id}`}>Hello {user.fullname}</Link>
-            <button onClick={onLogout}>Logout</button>
+            <div className="user-info">
+              <div>
+                <Link to={`/user/${user._id}`}>Hello {user.fullname}</Link>
+                <button onClick={onLogout}>Logout</button>
+              </div>
+              <div>
+                <p>Balance: {user.balance.toLocaleString()}$</p>
+              </div>
+            </div>
           </section>
         ) : (
           <section>

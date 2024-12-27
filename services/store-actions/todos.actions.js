@@ -1,4 +1,5 @@
 import { todoService } from "../../services/todo.service.js";
+import { userService } from "../../services/user.service.js";
 import { store } from "../../lib/store.js";
 import {
   showErrorMsg,
@@ -30,6 +31,17 @@ export function removeTodo(todoId) {
   );
   if (!isConfirmed) return;
   store.dispatch({ type: "REMOVE_TODO", todoId });
+  todoService.get(todoId).then((todo) => {
+    store.dispatch({
+      type: "LOG_ACTIVITY",
+      activity: `Removed todo '${
+        todo.txt
+      }' at ${new Date().toLocaleTimeString()}`,
+    });
+
+    userService.updateUser(store.getState().userModule.loggedInUser);
+  });
+
   todoService
     .remove(todoId)
     .then(() => {
@@ -43,6 +55,30 @@ export function removeTodo(todoId) {
 
 export function changeTodo(todo) {
   store.dispatch({ type: "CHANGE_TODO", todo: todo });
+
+  todoService
+    .get(todo._id)
+    .then((todo) => {
+      store.dispatch({
+        type: "LOG_ACTIVITY",
+        activity: `Changed todo '${
+          todo.txt
+        }' at ${new Date().toLocaleTimeString()}`,
+      });
+
+      userService.updateUser(store.getState().userModule.loggedInUser);
+    })
+    .catch((err) => {
+      store.dispatch({
+        type: "LOG_ACTIVITY",
+        activity: `Created new todo '${
+          todo.txt
+        }' at ${new Date().toLocaleTimeString()}`,
+      });
+
+      userService.updateUser(store.getState().userModule.loggedInUser);
+    });
+
   todoService
     .save(todo)
     .then((savedTodo) => {

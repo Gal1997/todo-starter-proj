@@ -6,6 +6,9 @@ export function login(credentials) {
     .login(credentials)
     .then((user) => {
       store.dispatch({ type: "SET_USER", user });
+
+      document.body.style.backgroundColor = user.prefs.bgColor || "white";
+      document.body.style.color = user.prefs.color || "black";
     })
     .catch((err) => {
       console.log("user actions -> Cannot login", err);
@@ -34,4 +37,20 @@ export function logout() {
       console.log("user actions -> Cannot logout", err);
       throw err;
     });
+}
+
+export function increaseBalanceBy(amount) {
+  store.dispatch({ type: "INCREASE_BALANCE_BY", amount });
+  const user = store.getState().userModule.loggedInUser;
+  return userService.updateUser(user);
+}
+
+export function updateUser(user) {
+  console.log("user in user service", user);
+  store.dispatch({ type: "SET_USER", user });
+
+  document.body.style.backgroundColor = user.prefs.bgColor || "white";
+  document.body.style.color = user.prefs.color || "black";
+
+  return userService.updateUser(user);
 }

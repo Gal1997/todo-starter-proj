@@ -6,6 +6,7 @@ import { showErrorMsg, showSuccessMsg } from "../services/event-bus.service.js";
 import { loadTodos } from "../services/store-actions/todos.actions.js";
 import { removeTodo } from "../services/store-actions/todos.actions.js";
 import { changeTodo } from "../services/store-actions/todos.actions.js";
+import { increaseBalanceBy } from "../services/store-actions/user.actions.js";
 
 const { useState, useEffect } = React;
 const { Link, useSearchParams } = ReactRouterDOM;
@@ -62,9 +63,11 @@ export function TodoIndex() {
   function onToggleTodo(todo) {
     const newTodo = { ...todo, isDone: !todo.isDone };
     changeTodo(newTodo);
+    if (newTodo.isDone) increaseBalanceBy(10);
   }
 
-  if (!todos) return <div>Loading...</div>;
+  if (!todos || todos.length == 0 || todos.isLoading)
+    return <h1>Loading...</h1>;
   return (
     <section className="todo-index">
       <TodoFilter filterBy={filterBy} onSetFilterBy={setFilterBy} />

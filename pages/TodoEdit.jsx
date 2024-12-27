@@ -59,6 +59,9 @@ export function TodoEdit() {
   function onSaveTodo(ev) {
     ev.preventDefault();
     changeTodo(todoToEdit);
+    setTimeout(() => {
+      navigate("/todo");
+    }, 1000);
     /* todoService
       .save(todoToEdit)
       .then((savedTodo) => {
@@ -72,9 +75,8 @@ export function TodoEdit() {
   }
 
   if (isLoading) return <div>Loading...</div>;
-  if (!todoToEdit) return <div>Todo not found</div>;
-
-  const { txt, importance, isDone } = todoToEdit;
+  if (!params && !todoToEdit) return <div>Todo not found</div>;
+  const { txt = "", importance = "", isDone = false } = todoToEdit || {};
   return (
     <section className="todo-edit">
       <form onSubmit={onSaveTodo}>
@@ -99,7 +101,7 @@ export function TodoEdit() {
         <label htmlFor="isDone">isDone:</label>
         <input
           onChange={handleChange}
-          value={isDone}
+          checked={isDone}
           type="checkbox"
           name="isDone"
           id="isDone"
