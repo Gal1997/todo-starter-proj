@@ -1,34 +1,59 @@
 .app-header {
-    background-color: var(--clr1);
-    color: var(--clr2bg-light);
-    
+  background-color: var(--clr1);
+  color: var(--clr2bg-light);
 }
 
 .header-container {
-    display: flex;
-    align-items: center;
-
+  display: flex;
+  align-items: center;
 }
 
 .header-container h1 {
-    flex-grow: 1;
+  flex-grow: 1;
 }
 
 .app-nav {
-    display: flex;
-    gap: 15px;
+  display: flex;
+  gap: 15px;
 }
-
 
 a.active {
-    color: rgb(241, 212, 241);
-    font-weight: 600;
-    text-decoration: underline;
+  color: rgb(241, 212, 241);
+  font-weight: 600;
+  text-decoration: underline;
 }
 
+.progress-bar-container {
+  width: 60%;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  height: 20px;
+  align-self: center;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #76c7c0;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.progress-text {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+  color: rgb(0, 62, 10);
+  font-weight: bolder;
+  pointer-events: none; /* Prevents text from interfering with clicks */
+}
 
 @media (max-width: 720px) {
-    .app-header {
-        color: var(--clr2bg-light);
-    }
+  .app-header {
+    color: var(--clr2bg-light);
+  }
 }
